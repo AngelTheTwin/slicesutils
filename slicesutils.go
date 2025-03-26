@@ -313,6 +313,12 @@ func Find[I any, S ~[]I](inputSlice S, findFunc func(I) bool) (foundItem I, didF
 	return zero, false
 }
 
+// SafeFind iterates over the elements of the input slice and applies the provided
+// findFunc to each element to determine if it matches a specific condition. If a match
+// is found, the function returns the matching item, a boolean indicating success, and nil
+// for the error. If no match is found, it returns the zero value of the item type, false,
+// and nil for the error. If an error occurs during the execution of findFunc, the function
+// immediately returns the zero value of the item type, false, and the encountered error.
 func SafeFind[I any, S ~[]I](inputSlice S, findFunc func(I) (bool, error)) (foundItem I, didFind bool, err error) {
 	for _, input := range inputSlice {
 
