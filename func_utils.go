@@ -23,6 +23,6 @@ func getErrWithStackTrace() error {
 	buff := make([]byte, 4096)
 	n := runtime.Stack(buff, false)
 	stackTrace := string(buff[:n])
-	err := fmt.Errorf("report encountered panic: \nStack trace:\n%s", stackTrace)
+	err := fmt.Errorf("encountered panic: \nStack trace:\n%s", stackTrace)
 	return err
 }
