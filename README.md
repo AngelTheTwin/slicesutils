@@ -1,10 +1,9 @@
 # `slicesutils` – Utility Functions for Slices in Go (Legacy)
 
+
 A lightweight package providing utility functions for working with slices in Go, designed for versions prior to the introduction of the [`slices`](https://pkg.go.dev/slices) package in the standard library.
 
-This package is considered **legacy** and is intended for projects that require backwards compatibility with earlier Go versions.
-
-Some functions are still usefull in newer Go versions.
+This package uses **generics** (introduced in Go 1.18) to provide type-safe and flexible utilities. While it's considered **legacy** and intended for projects that require backwards compatibility with earlier standard library features, some functions remain useful even in newer versions of Go.
 
 ## Examples
 
