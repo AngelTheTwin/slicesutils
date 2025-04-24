@@ -13,6 +13,10 @@ import "bitbucket.org/yourteam/slicesutils"
 
 max := slicesutils.Max(3, 1, 9, 5)
 // max == 9
+```
+
+### Map
+```go
 doubled := slicesutils.Map([]int{1, 2, 3}, func(n int) int {
     return n * 2
 })
