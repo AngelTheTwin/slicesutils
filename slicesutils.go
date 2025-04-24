@@ -2,6 +2,7 @@ package slicesutils
 
 import (
 	"cmp"
+	"math"
 	"runtime"
 	"sort"
 	"sync"
@@ -9,7 +10,7 @@ import (
 
 // Max returns the maximum value in the provided slice.
 // If no elements are provided, it panics with "No element provided to Max".
-func Max(elements ...int) int {
+func Max[T cmp.Ordered](elements ...T) T {
 	if len(elements) == 0 {
 		panic("No element provided to Max")
 	}
@@ -19,6 +20,18 @@ func Max(elements ...int) int {
 		if num > maxValue {
 			maxValue = num
 		}
+	}
+	return maxValue
+}
+
+func MaxFunc[T any](max func(T, T) T, elements ...T) T {
+	if len(elements) == 0 {
+		panic("No element provided to Max")
+	}
+
+	maxValue := elements[0]
+	for _, num := range elements {
+		maxValue = max(maxValue, num)
 	}
 	return maxValue
 }
@@ -100,23 +113,6 @@ func SafeMap[I any, O any, S ~[]I](inputSlice S, mappingFunc func(I) (O, error))
 	return outputSlice, nil
 }
 
-// Filter applies a filter function to each element in the inputSlice and returns a new slice
-// containing only the elements for which the filter function returns true.
-// The filter function takes an element of type T as input and returns a boolean value.
-// The inputSlice is not modified.
-func Filter[I any, S ~[]I](inputSlice S, filterFunc func(I) bool) S {
-	newSliceLen := 0
-
-	for _, input := range inputSlice {
-		if filterFunc(input) {
-			inputSlice[newSliceLen] = input
-			newSliceLen++
-		}
-	}
-
-	return inputSlice[:newSliceLen]
-}
-
 // Reduce applies a function to each element of the input slice and returns a single value.
 // The reduceFunc function takes two arguments: an accumulator value of type U and an element of the input slice of type I.
 // It returns a new accumulator value of type O.
@@ -155,6 +151,23 @@ func SafeReduce[I any, O any, S ~[]I](inputSlice S, reduceFunc func(O, I) (O, er
 	return accumulator, nil
 }
 
+// Filter applies a filter function to each element in the inputSlice and returns a new slice
+// containing only the elements for which the filter function returns true.
+// The filter function takes an element of type T as input and returns a boolean value.
+// The inputSlice is not modified.
+func Filter[I any, S ~[]I](inputSlice S, filterFunc func(I) bool) S {
+	newSliceLen := 0
+
+	for _, input := range inputSlice {
+		if filterFunc(input) {
+			inputSlice[newSliceLen] = input
+			newSliceLen++
+		}
+	}
+
+	return inputSlice[:newSliceLen]
+}
+
 // Sort sorts a slice of any type in place based on the provided less function.
 // The less function should return true if the first argument is considered to be less than the second.
 func Sort[I any, S ~[]I](slice S, less func(i, j I) bool) S {
@@ -189,27 +202,27 @@ func WeightedSort[I any, W cmp.Ordered, S ~[]I](slice S, getWeighfn func(I) W, l
 	return slice
 }
 
-// RemoveElement removes the first n occurrences of the specified element from the given slice.
-// Passing nil to occurrencesToDelete will remove all occurrences of the element.
-// It returns a new slice with the element removed, or the original slice if the element is not found.
-func RemoveElement[I comparable, S ~[]I](slice S, element I, occurrencesToDelete *int) S {
+// RemoveElement returns a slice that contains the elements of the input slice
+// with at most n occurrences of element removed.
+//
+//	n == 0    → nothing is removed
+//	n  > 0    → remove the first n matches, then pass the rest through
+//	n == -1   → remove ALL matches
+func RemoveElement[I comparable, S ~[]I](slice S, element I, occurrencesToDelete int) S {
 	if len(slice) == 0 {
 		return slice
 	}
 
-	limit := -1 // Default to removing all occurrences
-	if occurrencesToDelete != nil {
-		if *occurrencesToDelete <= 0 {
-			return slice
-		}
-		limit = *occurrencesToDelete
+	limit := occurrencesToDelete
+	if limit == -1 {
+		limit = math.MaxInt
 	}
 
 	count := 0
 
 	newSliceLen := 0
 	for _, e := range slice {
-		if e == element && (limit == -1 || count < limit) {
+		if e == element && (count < limit) {
 			count++
 			continue
 		}
@@ -223,8 +236,7 @@ func RemoveElement[I comparable, S ~[]I](slice S, element I, occurrencesToDelete
 // RemoveFirstOccurrence removes the first occurrence of the specified element from the given slice.
 // It's a shorthand for calling RemoveElement with occurrencesToDelete set to 1.
 func RemoveFirstOccurrence[I comparable, S ~[]I](slice S, element I) S {
-	ocurrencesToDelete := 1
-	return RemoveElement(slice, element, &ocurrencesToDelete)
+	return RemoveElement(slice, element, 1)
 }
 
 // RemoveElements removes all occurrences of the specified elements from the given slice.

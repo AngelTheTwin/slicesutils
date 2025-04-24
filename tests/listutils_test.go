@@ -71,8 +71,7 @@ func TestRemoveElement_OneOcurrence(t *testing.T) {
 	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	expected := []int{1, 2, 3, 4, 6, 7, 8, 9, 10}
 
-	elementsToRemove := 1
-	result := slicesutils.RemoveElement(items, 5, &elementsToRemove)
+	result := slicesutils.RemoveElement(items, 5, 1)
 
 	if ok := slicesutils.Compare(expected, result); !ok {
 		t.Errorf("Expected %v, but got %v", expected, result)
@@ -83,8 +82,7 @@ func TestRemoveElement_MultipleOcurrences(t *testing.T) {
 	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 5, 5, 5}
 	expected := []int{1, 2, 3, 4, 6, 7, 8, 9, 10, 5, 5}
 
-	elementsToRemove := 2
-	result := slicesutils.RemoveElement(items, 5, &elementsToRemove)
+	result := slicesutils.RemoveElement(items, 5, 2)
 
 	if ok := slicesutils.Compare(expected, result); !ok {
 		t.Errorf("Expected %v, but got %v", expected, result)
@@ -95,7 +93,7 @@ func TestRemoveElement_AllOcurrences(t *testing.T) {
 	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 5, 5, 5}
 	expected := []int{1, 2, 3, 4, 6, 7, 8, 9, 10}
 
-	result := slicesutils.RemoveElement(items, 5, nil)
+	result := slicesutils.RemoveElement(items, 5, -1)
 
 	if ok := slicesutils.Compare(expected, result); !ok {
 		t.Errorf("Expected %v, but got %v", expected, result)
