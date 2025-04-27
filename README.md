@@ -1,4 +1,4 @@
-# `slicesutils` – Utility Functions for Slices in Go (Legacy)
+# `slicesutils` – Utility Functions for Slices in Go (Legacy) (New functions for iter.Seq go >=1.23 just added!)
 
 
 A lightweight package providing utility functions for working with slices in Go, designed for versions prior to the introduction of the [`slices`](https://pkg.go.dev/slices) package in the standard library.
@@ -56,6 +56,54 @@ chunks := slicesutils.Chunk([]int{1, 2, 3, 4, 5}, 2)
 ```go
 unique := slicesutils.Distinct([]int{1, 2, 2, 3, 3, 3})
 // unique == []int{1, 2, 3}
+```
+
+## Sequence Utilities (Go 1.23+)
+
+### MaxSeq
+```go
+import "bitbucket.org/yourteam/slicesutils"
+import "iter"
+
+seq := iter.Seq([]int{3, 1, 9, 5})
+max := slicesutils.MaxSeq(seq)
+// max == 9
+```
+
+### MapSeq
+```go
+import "bitbucket.org/yourteam/slicesutils"
+import "iter"
+
+seq := iter.Seq([]int{1, 2, 3})
+doubledSeq := slicesutils.MapSeq(seq, func(n int) int {
+    return n * 2
+})
+// doubledSeq yields 2, 4, 6
+```
+
+### FilterSeq
+```go
+import "bitbucket.org/yourteam/slicesutils"
+import "iter"
+
+seq := iter.Seq([]int{1, 2, 3, 4})
+evensSeq := slicesutils.FilterSeq(seq, func(n int) bool {
+    return n%2 == 0
+})
+// evensSeq yields 2, 4
+```
+
+### ReduceSeq
+```go
+import "bitbucket.org/yourteam/slicesutils"
+import "iter"
+
+seq := iter.Seq([]int{1, 2, 3, 4})
+sum := slicesutils.ReduceSeq(seq, func(acc, n int) int {
+    return acc + n
+}, 0)
+// sum == 10
 ```
 
 ## Open Source and Contributions
