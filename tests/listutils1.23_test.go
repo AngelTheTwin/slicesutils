@@ -169,3 +169,26 @@ func TestDistinctSeq(t *testing.T) {
 		t.Errorf("Expected %v, but got %v", expected, result)
 	}
 }
+
+func TestGroupBySeq(t *testing.T) {
+	result := slicesutils.GroupBySeq(
+		itemsSeq,
+		func(item int) string {
+			if item%2 == 0 {
+				return "even"
+			}
+			return "odd"
+		},
+	)
+
+	for key, group := range result {
+		for item := range group {
+			if key == "even" && item%2 != 0 {
+				t.Errorf("Expected even group, but got odd item %d", item)
+			}
+			if key == "odd" && item%2 == 0 {
+				t.Errorf("Expected odd group, but got even item %d", item)
+			}
+		}
+	}
+}

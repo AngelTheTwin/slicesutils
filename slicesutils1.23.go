@@ -324,3 +324,28 @@ func CompareSeq[I comparable](a, b iter.Seq[I]) bool {
 		}
 	}
 }
+
+func GroupBySeq[I any, K comparable](inputSeq iter.Seq[I], keyFunc func(I) K) iter.Seq2[K, iter.Seq[I]] {
+	groups := make(map[K][]I)
+
+	for item := range inputSeq {
+		key := keyFunc(item)
+		groups[key] = append(groups[key], item)
+	}
+
+	// Step 2: Yield each group only once
+	return func(yield func(K, iter.Seq[I]) bool) {
+		for key, items := range groups {
+			seq := func(yieldItem func(I) bool) {
+				for _, item := range items {
+					if !yieldItem(item) {
+						return
+					}
+				}
+			}
+			if !yield(key, seq) {
+				return
+			}
+		}
+	}
+}
