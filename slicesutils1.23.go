@@ -87,6 +87,23 @@ func ReduceSeq[I any, O any](inputSeq iter.Seq[I], reduceFunc func(O, I) O, init
 	return result
 }
 
+// ExpandSeq takes an input sequence of type iter.Seq[I] and a reduce function
+// that transforms each element of type I into a slice of elements of type O.
+// It returns a new sequence of type iter.Seq[O] where each element of the input
+// sequence is expanded into multiple elements based on the reduce function.
+func ExpandSeq[I any, O any](inputSeq iter.Seq[I], reduceFunc func(I) []O) iter.Seq[O] {
+	return func(yield func(O) bool) {
+		for item := range inputSeq {
+			currentResult := reduceFunc(item)
+			for _, res := range currentResult {
+				if !yield(res) {
+					return
+				}
+			}
+		}
+	}
+}
+
 func SafeReduceSeq[I any, O any](inputSeq iter.Seq[I], reduceFunc func(O, I) (O, error), initialValue O) (O, error) {
 	result := initialValue
 	for input := range inputSeq {
